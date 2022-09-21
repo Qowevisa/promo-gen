@@ -52,7 +52,7 @@ LOG_LINE_FUNC(const char *bar_name, byte *bar, byte n)
 
 #define LOG_LINE(bar, n) LOG_LINE_FUNC(#bar, bar, n)
 
-byte *
+void
 PB_M(byte *bar, byte n, byte (*PB_fun)(byte))
 {
 	DEFEND(n, "PB_M insufficient n");
@@ -100,6 +100,31 @@ PB1_2(byte b)
 }
 
 
+#define b_line_len 32
+#define bll b_line_len
+
+void
+test_PB(byte (*PB)(byte))
+{
+	byte line[bll] = {0};
+	byte start_val = 0;
+	do {
+		for (byte i = 0; i < bll; i++) { line[i] = start_val++; };
+		//
+		for (byte i = 0; i < 65; i++) {
+			for (byte j = 0; j < bll; j++) {
+				if (j > 1 && j % 16 == 0) { printf(" | "); }
+				printf("%c%c ", LOG_BYTE(line[j]));
+				line[j] = PB(line[j]);
+			}
+			printf("\n");
+		}
+		printf("\n");
+		//
+	} while (start_val != 0);
+}
+//
+
 #define HIGH 1
 #define LOW 0
 
@@ -138,7 +163,6 @@ create_promocode(number num)
 int
 main(void)
 {
-	
-	LOG_CODE();
+	test_PB(PB1_2);
 	return 0;
 }
