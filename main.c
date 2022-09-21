@@ -25,14 +25,6 @@ return \
 #define LOG2(bytes) \
 	LOG(bytes[0]); \
 	LOG(bytes[1]);
-#define LOG2_LINE(bytes) printf("%s = %c%c%c%c ; %u\n", #bytes, LOG_BYTE(bytes[1]), LOG_BYTE(bytes[0]), (bytes[1] << 8) + bytes[0]);
-// #define LOG3_LINE(bytes) printf("%s = %c%c%c%c%c%c ; %u\n", #bytes LOG_BYTE(bytes[2]), LOG_BYTE(bytes[1]), LOG_BYTE(bytes[0])
-
-byte
-PB1(byte b)
-{
-	P_BLOCK(6, 8, 1, 7, 2, 4, 5, 3);
-}
 
 static inline
 void
@@ -51,7 +43,6 @@ die(char *str)
 void
 LOG_LINE_FUNC(const char *bar_name, byte *bar, byte n)
 {
-	// DEFEND(n, "LOG_LINE_FUNC insufficient n");
 	printf("%s = ", bar_name);
 	for (byte i = n-1; i < n; i--) {
 		printf("%c%c", LOG_BYTE(bar[i]));
@@ -96,6 +87,19 @@ byte code[CODE_LEN] = {0};
 
 #define LOG_CODE() LOG_LINE(code, CODE_LEN);
 
+byte
+PB1_1(byte b)
+{
+	P_BLOCK(6, 8, 1, 7, 2, 4, 5, 3);
+}
+
+byte
+PB1_2(byte b)
+{
+	P_BLOCK(7, 1, 5, 8, 3, 6, 4, 2);
+}
+
+
 #define HIGH 1
 #define LOW 0
 
@@ -128,7 +132,7 @@ place_fb(byte *code, byte *fb, byte pos)
 void
 create_promocode(number num)
 {
-
+	
 }
 
 int
