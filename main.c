@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <time.h>
 
 #define byte uint8_t
 #define number uint32_t
@@ -22,6 +23,7 @@ return \
 #define HEX_STR "0123456789ABCDEF"
 #define LOG_BYTE(byte) (HEX_STR[((byte&0xF0) >> 4)]), (HEX_STR[(byte&0xF)])
 #define LOG(byte) printf("%s = %c%c ; %u\n", #byte, LOG_BYTE(byte), byte)
+#define LOG_NUM(num) printf("%s = %u;\n", #num, num);
 #define LOG2(bytes) \
 	LOG(bytes[0]); \
 	LOG(bytes[1]);
@@ -63,6 +65,7 @@ PB_M(byte *bar, byte n, byte (*PB_fun)(byte))
 
 #define _2PB(bar, PB_fun) PB_M(bar, 2, PB_fun);
 
+
 #define GET_BYTE(num, n) ((num >> (8*n)) & 0xFF)
 #define POST_BYTE(byte, n) byte << (8*n)
 
@@ -99,6 +102,27 @@ PB1_2(byte b)
 	P_BLOCK(7, 1, 5, 8, 3, 6, 4, 2);
 }
 
+void
+get_bits(number num, byte *bar)
+{
+	for (byte i = 0; i < 8; i++) {
+		bar[i] = ((num >> (i*0x3)) & 0x3);
+	}
+}
+
+byte
+PB_CONSTRUCT_FROM_NUM(byte b, number num)
+{
+	byte bar[8] = {0};
+	get_bits(num, bar);
+	P_BLOCK(bar[7], bar[6], bar[5], bar[4], bar[3], bar[2], bar[1], bar[0]);
+}
+
+byte
+PB_CONSTRUCT(byte b, byte *bar)
+{
+	P_BLOCK(bar[7], bar[6], bar[5], bar[4], bar[3], bar[2], bar[1], bar[0]);
+}
 
 #define b_line_len 32
 #define bll b_line_len
@@ -123,6 +147,41 @@ test_PB(byte (*PB)(byte))
 		//
 	} while (start_val != 0);
 }
+
+#define used_byte 255
+
+void
+gen_random_PB()
+{
+	byte bits[8];
+	{
+		byte keys[8];
+		for (byte i = 0; i < 8; i++) {
+			keys[i] = i;
+		}
+		LOG_LINE(keys, 8);
+		byte used_keys = 0;
+		byte last_indx = 0;
+		byte randb = 0;
+		byte rand_indx = 0;
+		srand(time(NULL));
+		while (used_keys != 8) {
+			if (used_keys == 7) {
+				bits[used_keys] = keys[last_indx];
+				break;
+			}	
+			rand_indx = rand() % 8;
+			randb = keys[rand_indx];
+			if (randb == used_byte) { continue; }
+			bits[used_keys++] = randb;
+			last_indx ^= rand_indx;
+			keys[rand_indx] = used_byte;
+		}
+	}
+	LOG_LINE(bits, 8);
+	test_PB(PB1_1);
+}
+
 //
 
 #define HIGH 1
@@ -163,6 +222,7 @@ create_promocode(number num)
 int
 main(void)
 {
-	test_PB(PB1_2);
+	// test_PB(PB1_2);
+	gen_random_PB();
 	return 0;
 }
