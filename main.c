@@ -110,7 +110,7 @@ get_bits(number num, byte *bar)
 	}
 }
 
-byte
+static inline byte
 PB_CONSTRUCT_FROM_NUM(byte b, number num)
 {
 	byte bar[8] = {0};
@@ -118,7 +118,7 @@ PB_CONSTRUCT_FROM_NUM(byte b, number num)
 	P_BLOCK(bar[7], bar[6], bar[5], bar[4], bar[3], bar[2], bar[1], bar[0]);
 }
 
-byte
+static inline byte
 PB_CONSTRUCT(byte b, byte *bar)
 {
 	P_BLOCK(bar[7], bar[6], bar[5], bar[4], bar[3], bar[2], bar[1], bar[0]);
@@ -157,7 +157,7 @@ gen_random_PB()
 	{
 		byte keys[8];
 		for (byte i = 0; i < 8; i++) {
-			keys[i] = i;
+			keys[i] = i + 1;
 		}
 		LOG_LINE(keys, 8);
 		byte used_keys = 0;
@@ -179,7 +179,12 @@ gen_random_PB()
 		}
 	}
 	LOG_LINE(bits, 8);
-	test_PB(PB1_1);
+	// temporal nested func for test
+	byte PB_tmp(byte b) {
+		return PB_CONSTRUCT(b, bits);
+	}
+	
+	test_PB(PB_tmp);
 }
 
 //
